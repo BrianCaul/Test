@@ -2,8 +2,7 @@ import { Route, Router } from 'react-router';
 import BrowserHistory from 'react-router/lib/BrowserHistory';
 import HashHistory from 'react-router/lib/HashHistory';
 
-import Graph from 'routes/graph';
-import Panels from 'routes/panels';
+import Blank from 'routes/blank';
 
 export default (withHistory, onUpdate) => {
   const history = withHistory?
@@ -13,8 +12,7 @@ export default (withHistory, onUpdate) => {
                 : null;
   return (
     <Router history={history} onUpdate={onUpdate}>
-      <Route path='/' component={Graph} />
-      <Route path='/panels' component={Panels} />
+      <Route path='/' component={Blank} />
     </Router>
   );
 };

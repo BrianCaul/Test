@@ -101,9 +101,9 @@
       position: absolute;
 
       @if $sidebar-controls-visibility == hidden {
-        top: 0px;
+        top: 75px;
       } @else {
-        top: 10px;
+        top: 110px;
       }
 
       >.sidebar {
