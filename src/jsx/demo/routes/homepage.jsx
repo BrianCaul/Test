@@ -1,251 +1,133 @@
-import { State, Navigation } from 'react-router';
 import classNames from 'classnames';
+import SidebarMixin from 'global/jsx/sidebar_component';
 
-class Hero extends React.Component {
+import Sidebar from 'common/sidebar';
+import Footer from 'common/footer';
+
+
+class MainChart extends React.Component {
+  componentDidMount() {
+
+ var now = moment().minutes(0).seconds(0).milliseconds(0);
+ var groupCount = 3;
+ var itemCount = 7;
+ var group0Time = 0;
+ var group1Time = 0;
+ var group2Time = 0;
+
+ // create a dataset with items
+ var items = new vis.DataSet();
+ for (var i = 0; i < itemCount; i++) {
+   var start = now.clone().add(Math.random() * 20, 'hours');
+   var end = start.clone().add((Math.random() * 2), 'hours');
+      
+   var group = Math.floor(Math.random() * groupCount);
+   var style  ='';
+   if(group == 0){
+      var diffInMillisecs = moment.duration(end.diff(start))._milliseconds;
+      var hourDiff = diffInMillisecs / (60*60*1000);
+      group0Time = group0Time + hourDiff;
+      style='color: red; background-color: red;'
+   }
+   if(group == 1){
+      var diffInMillisecs = moment.duration(end.diff(start))._milliseconds;
+      var hourDiff = diffInMillisecs / (60*60*1000);
+      group1Time = group1Time + hourDiff;
+      style='color: blue; background-color: blue;'
+   }
+   if(group == 2){
+      var diffInMillisecs = moment.duration(end.diff(start))._milliseconds;
+      var hourDiff = diffInMillisecs / (60*60*1000);
+      group2Time = group2Time + hourDiff;
+      style='color: green; background-color: green;'
+   }
+   items.add({
+     id: i,
+     group: group,
+     start: start,
+     end: end,
+     type: 'range',
+     style: style,
+     margin: 0
+   });
+  }
+
+  // create a data set with groups
+   var names = [
+      'AHU Cool Failure:        ' + Math.round( group0Time * 10) / 10 +'h', 
+      'AHU Cool/Heat Mode Cycle: '+ Math.round( group1Time * 10) / 10 +'h', 
+      'AHU Fan Short Cycling:    '+ Math.round( group2Time * 10) / 10 +'h'];
+   var groups = new vis.DataSet();
+   groups.add({id: 0, content: names[0]});
+   groups.add({id: 1, content: names[1]});
+   groups.add({id: 2, content: names[2]});
+
+  // create visualization
+  var container = document.getElementById('visualization');
+  var options = {
+      height:"190px",
+      groupOrder: 'content',  // groupOrder can be a property name or a sorting function
+      stack: false,
+      timeAxis: {scale: 'hour', step: 1},
+      showMajorLabels: true,
+      showMinorLabels: true,
+      zoomMax: 86400000,
+      zoomMin: 1800000
+    };
+
+  var timeline = new vis.Timeline(container);
+  timeline.setOptions(options);
+  timeline.setGroups(groups);
+  timeline.setItems(items);
+
+
+  }
   render() {
     return (
-      <div {...this.props}
-           className={classNames(this.props.className,
-                                 'homepage-hero')}>
-        <Container fixed>
-          {this.props.children}
-        </Container>
-      </div>
+      <PanelBody style={{paddingTop: 10, height: 210}}>
+        <div id='visualization'></div>
+      </PanelBody>
     );
   }
 }
 
-class HeroHeader extends React.Component {
+class Body extends React.Component {
   render() {
     return (
-      <div {...this.props}
-           className={classNames(this.props.className,
-                                 'homepage-hero-header')}>
-        {this.props.children}
-      </div>
-    );
-  }
-}
+      <Container id='body'>
+        <Grid>
+          <Row>
+            <Col sm={12}>
+              <PanelContainer plain={true}>
+                <Panel>
+                  <div className='text-center'>
 
-class HeroHeader2 extends React.Component {
-  render() {
-    return (
-      <div {...this.props}
-           className={classNames(this.props.className,
-                                 'homepage-hero-header2')}>
-        {this.props.children}
-      </div>
-    );
-  }
-}
+                  <MainChart />
 
-export default React.createClass({
-  mixins: [State, Navigation],
-  handleNavigation() {
-    $('body').addClass('fade-out');
-    setTimeout(() => {
-      this.transitionTo('/app/dashboard');
-    }, 250);
-  },
-  render() {
-    return (
-      <Container id='homepage-container'>
-        <Button bsStyle='deepred' id='demo-btn' onClick={this.handleNavigation}>View Demo</Button>
-        <div>
-          <Hero className='text-center hidden-xs' style={{height: 475, backgroundImage: 'url(/imgs/homepage/background.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', overflow: 'hidden'}}>
-            <img src='/imgs/homepage/simplepowerful.png' style={{marginTop: 5}} />
-          </Hero>
-          <Hero className='text-center visible-xs' style={{height: 270, backgroundImage: 'url(/imgs/homepage/background.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', overflow: 'hidden'}}>
-            <img width='270' className='visible-xs' src='/imgs/homepage/simplepowerful.png' style={{margin: 'auto', marginTop: 30}} />
-          </Hero>
-        </div>
-        <Hero>
-          <HeroHeader>
-            <span>{"Don't wait for Web Components"}</span></HeroHeader>
-          <HeroHeader2>{"Embrace React "}<sup><small><BLabel className='bg-deepred fg-white'>v0.13.3</BLabel></small></sup></HeroHeader2>
-          <Grid>
-            <Row>
-              <Col sm={7} collapseLeft collapseRight>
-                <p style={{marginTop: 60}}>
-                  Facebook recently open-sourced React, a library for building User Interfaces. It uses a Virtual DOM implementation for ultra-high performance.
-                </p>
-                <p>
-                  Rubix Admin app uses React for semantic markup coupled with CommonJS for composable Components. The result: <strong>clean and elegant code.</strong>
-                </p>
-              </Col>
-              <Col sm={5} collapseLeft collapseRight>
-                <div className='hidden-xs text-right'>
-                  <img src='/imgs/homepage/reactcode.png' />
-                </div>
-                <div className='visible-xs text-center'>
-                  <img width='250' src='/imgs/homepage/reactcode.png' />
-                </div>
-              </Col>
-            </Row>
-          </Grid>
-        </Hero>
-        <Hero>
-          <HeroHeader2>{"Bootstrap on Steroids"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/bootstrapreact.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/bootstrapreact.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            Rubix implements custom React Components for Bootstrap enabling you to write shorter, semantic markup. Say Goodbye to unwieldy classnames and spaghetti code!
-          </p>
-        </Hero>
-        <Hero>
-          <HeroHeader>{"Internationalization and Localization"}</HeroHeader>
-          <HeroHeader2>{"Mozilla L20n.js"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/mozflags.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/mozflags.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            {"Mozilla L20n is a developer friendly framework that places languages in the localizer's hand to create better translations. "}
-          </p>
-          <p className='text-center'>
-            {"It removes the need for developers to thoroughly understand the specifics of a natural language and provides an opportunity for localizers to create better translations. Rubix ships with custom React component bindings for the framework."}
-          </p>
-        </Hero>
-        <Hero>
-          <HeroHeader2>{"Rubix Charts"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/rubixcharts.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/rubixcharts.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            Rubix Charts is an aesthetically beautiful, hand-crafted charting library created exclusively for Rubix Admin app. We used the awesome D3.JS library to write all the charting components (Line, Area, Stacked, Bar, Column, Pie and Donut) that power Rubix Charts.
-          </p>
-        </Hero>
-        <Hero>
-          <HeroHeader>{"Create complex layouts easily"}</HeroHeader>
-          <HeroHeader2>{"Panels"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/panels.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/panels.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            {"Rubix Panels empowers developers to create complex layouts in addition to the awesome Grid provided by Twitter Bootstrap. Pretty much every example page showcased in the demo makes use of Panels for layout."}
-          </p>
-        </Hero>
-        <Hero style={{position: 'relative', zIndex: 2}}>
-          <HeroHeader>
-            <span>{"The Asset Pipeline "}</span>
-            <sup><BLabel className='bg-deepred fg-white'>NEW!</BLabel></sup>
-          </HeroHeader>
-          <HeroHeader2>{"Gulp, Flip and Bless!"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/assetpipeline.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/assetpipeline.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            {"Gulp is a streaming build system. It's use of streams and code-over-configuration makes for a simpler and more intuitive build system. Rubix's Asset Pipeline depends entirely on Gulp as its backbone. "}<strong>{"Everything is automated"}</strong>{": be it compiling JSX, SASS or even WebFonts!"}
-          </p>
-          <p className='text-center'>
-            {"Rubix relies on Webpack which takes modules with dependencies and generates static assets representing those modules. We make use of Twitter's "}<strong>{"css-flip"}</strong>{" for RTL support and the awesome "}<strong>{"blesscss"}</strong>{" library for fixing IE9 selectors and stylesheet bug."}
-          </p>
-        </Hero>
-        <Hero style={{position: 'relative', zIndex: 2}}>
-          <HeroHeader>
-            <span>{"Isomorphic Javascript "}</span>
-            <sup><BLabel className='bg-deepred fg-white'>NEW!</BLabel></sup>
-          </HeroHeader>
-          <HeroHeader2>{"Render client code on the server!"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <div className='hidden-xs'>
-              <img src='/imgs/homepage/isomorphic.png' />
-            </div>
-            <div className='visible-xs'>
-              <img width='250' src='/imgs/homepage/isomorphic.png' />
-            </div>
-          </div>
-          <p className='text-center'>
-            {"Rubix uses React-Router to provide routing client side and reuses the same routing logic for rendering compiled HTML from the server making your app SEO friendly."}
-          </p>
-        </Hero>
-        <Hero style={{position: 'relative', zIndex: 2}}>
-          <HeroHeader>
-            <span>{"BrowserSync + React Hot Loader "}</span>
-            <sup><BLabel className='bg-deepred fg-white'>NEW!</BLabel></sup>
-          </HeroHeader>
-          <HeroHeader2>{"Time-saving synchronised browser testing!"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <video loop autoPlay width='100%'>
-              <source src="/video/homepage/livereload.mp4" type="video/mp4" />
-              <source src="/video/homepage/livereload.ogv" type="video/ogg" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <p className='text-center'>
-            {"When you’re making responsive websites, there’s a lot of tweaking and testing to do. BrowserSync makes your workflow faster by "}<strong>synchronising URLs, interactions and code changes across multiple devices.</strong>{" BrowserSync is enabled for SASS files, Image files, Locale files and WebFonts."}
-          </p>
-          <p className='text-center'>
-            {"Rubix comes integrated with React Hot loader for live editing of React components using Webpack's Hot Module Replacement."}
-          </p>
-        </Hero>
-        <Hero style={{position: 'relative', zIndex: 2}}>
-          <HeroHeader>
-            <span>{"BabelJS "}</span>
-            <sup><BLabel className='bg-deepred fg-white'>NEW!</BLabel></sup>
-          </HeroHeader>
-          <HeroHeader2>{"Use the next generation Javascript, today!"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <img src='/imgs/homepage/babel.png' />
-          </div>
-          <p className='text-center'>
-            {"Rubix uses Babel for Javascript transformations. It ships with a set of ES2015 syntax transformers. These allow you to use new syntax, right now without waiting for browser support. It also ships with built-in support for JSX."}
-          </p>
-        </Hero>
-        <Hero style={{position: 'relative', zIndex: 2}}>
-          <HeroHeader>
-            <span>{"Multiple Language + Framework Integrations "}</span>
-            <sup><BLabel className='bg-deepred fg-white'>NEW!</BLabel></sup>
-          </HeroHeader>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <img src='/imgs/homepage/rubix-implementations.png' />
-          </div>
-          <p className='text-center'>
-            {"We will be providing implemention of Rubix in multiple languages/frameworks to ease development. Rubix 3.0 ships with a Ruby on Rails seed project with server side rendering powered by react-rails."}
-          </p>
-        </Hero>
-        <Hero className='subtle-bottom-shadow'>
-          <HeroHeader>{"One Last Thing"}</HeroHeader>
-          <HeroHeader2>{"Fanatical Support!"}</HeroHeader2>
-          <div className='text-center' style={{marginTop: 25, marginBottom: 25}}>
-            <img src='/imgs/homepage/support.png' />
-          </div>
-          <p className='text-center'>
-            {"We have already provided extensive documentation on using/implementing Rubix. However, we take this a step further by ensuring version releases (which includes bug fixes, new features etc) for the next 6 months and general support for 1 year."}
-          </p>
-        </Hero>
-        <div>
-          <Hero className='text-center' style={{height: 215, backgroundImage: 'url(/imgs/homepage/background.png)', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', overflow: 'hidden', backgroundPosition: '0% 100%'}}>
-            <h1 className='fg-white' style={{marginTop: 0, marginBottom: 25, fontWeight: 100}}>So what are you waiting for?</h1>
-            <Button lg outlined inverse retainBackground bsStyle='red' onClick={this.handleNavigation}>Click here to View Demo</Button>
-          </Hero>
-        </div>
+                  </div>
+                </Panel>
+              </PanelContainer>
+            </Col>
+          </Row>
+        </Grid>
       </Container>
     );
   }
-});
+}
+
+@SidebarMixin
+export default class extends React.Component {
+  render() {
+    var classes = classNames({
+      'container-open': this.props.open
+    });
+
+    return (
+      <Container id='container' className={classes}>
+        <Sidebar />
+        <Body />
+        <Footer />
+      </Container>
+    );
+  }
+}
