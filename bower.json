@@ -36,6 +36,7 @@
     "vex": "~2.3.2",
     "jquery-ui": "~1.11.4",
     "chartjs": "~1.0.2",
+	"vis": "~4.9.0",
     "moment": "~2.10.3",
     "trumbowyg": "~1.1.7",
     "blueimp-gallery": "~2.15.2",

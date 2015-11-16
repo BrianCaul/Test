@@ -17,7 +17,7 @@ export default class extends React.Component {
         <Grid id='footer' className='text-center'>
           <Row>
             <Col xs={12}>
-              <div>© 2014 SketchPixy Creative - v{this.state.version}</div>
+              <div>Brian Caul ReactJS Example</div>
             </Col>
           </Row>
         </Grid>
