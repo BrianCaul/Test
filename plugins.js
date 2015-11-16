@@ -26,6 +26,7 @@ gulp.task('minifyplugins', function() {
     '/bower_components/eventemitter2/lib/eventemitter2.js',
     '/bower_components/vex/js/vex.combined.min.js',
     '/bower_components/chartjs/Chart.js',
+	'/bower_components/vis/dist/vis.js',
     '/bower_components/trumbowyg/dist/trumbowyg.js',
     '/bower_components/blueimp-gallery/js/blueimp-gallery.js',
     '/js/vendor/p-scrollbar/min/perfect-scrollbar.min.js',
